@@ -16,7 +16,7 @@
 
 use arithmetic::montgomery::*;
 use core;
-use {der, digest, ec, error, pkcs8, private, rand, signature};
+use {der, digest, ec, error, limb, pkcs8, private, rand, signature};
 use super::verify_jacobian_point_is_on_the_curve;
 use super::ops::*;
 use super::public_key::*;
@@ -37,6 +37,15 @@ pub struct ECDSAVerificationAlgorithm {
         for<'a> fn(ops: &'static ScalarOps, input: &mut untrusted::Reader<'a>)
                    -> Result<(untrusted::Input<'a>, untrusted::Input<'a>),
                              error::Unspecified>,
+}
+
+impl core::fmt::Debug for ECDSAVerificationAlgorithm {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        // XXX: This doesn't indicate `_ASN1` vs `_FIXED`.
+        write!(f, "ring::signature::ECDSA_P{}_SHA{}",
+            self.ops.scalar_ops.common.num_limbs * limb::LIMB_BITS,
+            self.digest_alg.output_len * 8)
+    }
 }
 
 impl signature::VerificationAlgorithm for ECDSAVerificationAlgorithm {

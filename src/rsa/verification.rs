@@ -14,6 +14,7 @@
 
 /// RSA PKCS#1 1.5 signatures.
 
+use core;
 use {bits, digest, error, private, signature};
 use super::{bigint, N, PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN, RSAParameters,
             parse_public_key};
@@ -30,6 +31,14 @@ impl signature::VerificationAlgorithm for RSAParameters {
 }
 
 impl private::Private for RSAParameters {}
+
+impl core::fmt::Debug for RSAParameters {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        // XXX: This doesn't include the padding algorithm nor the size range.
+        write!(f, "ring::signature::RSA_SHA{}",
+               self.padding_alg.digest_alg().output_len * 8)
+    }
+}
 
 macro_rules! rsa_params {
     ( $VERIFY_ALGORITHM:ident, $min_bits:expr, $PADDING_ALGORITHM:expr,
