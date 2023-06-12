@@ -154,6 +154,15 @@ impl SystemRandom {
     }
 }
 
+#[cfg(any(target_os = "wasi", target_os = "wasix"))]
+impl sealed::SecureRandom for SystemRandom {
+    #[inline(always)]
+    fn fill_impl(&self, dest: &mut [u8]) -> Result<(), error::Unspecified> {
+        getrandom::getrandom(dest).map_err(|_| error::Unspecified)
+    }
+}
+
+#[cfg(not(any(target_os = "wasi", target_os = "wasix")))]
 impl sealed::SecureRandom for SystemRandom {
     #[inline(always)]
     fn fill_impl(&self, dest: &mut [u8]) -> Result<(), error::Unspecified> {
@@ -168,7 +177,7 @@ impl crate::sealed::Sealed for SystemRandom {}
         any(target_os = "android", target_os = "linux"),
         not(feature = "dev_urandom_fallback")
     ),
-    target_arch = "wasm32",
+    all(target_arch = "wasm32", target_os = "unknown"),
     windows
 ))]
 use self::sysrand::fill as fill_impl;
@@ -299,7 +308,7 @@ mod sysrand_chunk {
 #[cfg(any(
     target_os = "android",
     target_os = "linux",
-    target_arch = "wasm32",
+    all(target_arch = "wasm32", target_os = "unknown"),
     windows
 ))]
 mod sysrand {

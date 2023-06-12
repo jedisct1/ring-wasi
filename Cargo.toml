@@ -1,16 +1,16 @@
 [package]
-authors = ["Brian Smith <brian@briansmith.org>"]
+authors = ["Brian Smith <brian@briansmith.org>", "Frank Denis <github@pureftpd.org>"]
 build = "build.rs"
 categories = ["cryptography", "no-std"]
-description = "Safe, fast, small crypto using Rust."
+description = "Ring for wasm32-wasi"
 documentation = "https://briansmith.org/rustdoc/ring/"
 edition = "2018"
 keywords = ["crypto", "cryptography", "rand", "ECC", "RSA"]
 license-file = "LICENSE"
-name = "ring"
+name = "ring-wasi"
 readme = "doc/link-to-readme.md"
-repository = "https://github.com/briansmith/ring"
-version = "0.16.20"
+repository = "https://github.com/jedisct1/ring-wasi"
+version = "0.16.25"
 
 # Prevent multiple versions of *ring* from being linked into the same program.
 links = "ring_core_dev"
@@ -20,6 +20,7 @@ include = [
     "Cargo.toml",
 
     "pregenerated/*",
+    "wasm-libs/*",
 
     "build.rs",
 
@@ -310,6 +311,9 @@ name = "ring"
 [dependencies]
 untrusted = { version = "0.7.1" }
 
+[target.'cfg(any(target_os = "wasi", target_os = "wasix"))'.dependencies]
+getrandom = { version = "0.2.10" }
+
 [target.'cfg(any(target_arch = "x86",target_arch = "x86_64", all(any(target_arch = "aarch64", target_arch = "arm"), any(target_os = "android", target_os = "fuchsia", target_os = "linux"))))'.dependencies]
 spin = { version = "0.5.2", default-features = false }
 
@@ -338,7 +342,7 @@ cc = { version = "1.0.66", default-features = false }
 
 [features]
 # These features are documented in the top-level module's documentation.
-default = ["alloc", "dev_urandom_fallback"]
+default = ["alloc", "dev_urandom_fallback", "wasm32_c"]
 alloc = []
 dev_urandom_fallback = ["once_cell"]
 internal_benches = []
