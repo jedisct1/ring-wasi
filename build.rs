@@ -280,7 +280,7 @@ const MSVC_OBJ_EXT: &str = "obj";
 
 fn main() {
     if let Ok(package_name) = std::env::var("CARGO_PKG_NAME") {
-        if package_name == "ring" {
+        if package_name.starts_with("ring") {
             ring_build_rs_main();
             return;
         }
@@ -308,6 +308,18 @@ fn ring_build_rs_main() {
 
     // Published builds are always release builds.
     let is_debug = is_git && env::var("DEBUG").unwrap() != "false";
+
+    if ["wasi", "wasix"].contains(&os.as_str()) {
+        let wasm_libs = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("wasm-libs");
+        if wasm_libs.exists() {
+            let src_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+            println!("cargo:rustc-link-lib=static=ring_core_dev_");
+            println!("cargo:rustc-link-search=native={}/wasm-libs", src_dir);
+            return;
+        } else {
+            env::set_var("CC", "zig cc -Ofast -s -target wasm32-wasi");
+        }
+    }
 
     let target = Target {
         arch,

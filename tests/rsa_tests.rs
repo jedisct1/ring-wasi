@@ -22,10 +22,10 @@ use ring::{
 };
 use std::convert::TryFrom;
 
-#[cfg(all(target_arch = "wasm32", feature = "wasm32_c"))]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown", feature = "wasm32_c"))]
 use wasm_bindgen_test::{wasm_bindgen_test as test, wasm_bindgen_test_configure};
 
-#[cfg(all(target_arch = "wasm32", feature = "wasm32_c"))]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown", feature = "wasm32_c"))]
 wasm_bindgen_test_configure!(run_in_browser);
 
 #[cfg(feature = "alloc")]

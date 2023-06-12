@@ -14,10 +14,10 @@
 
 #![cfg(any(not(target_arch = "wasm32"), feature = "wasm32_c"))]
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 use wasm_bindgen_test::{wasm_bindgen_test as test, wasm_bindgen_test_configure};
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 wasm_bindgen_test_configure!(run_in_browser);
 
 use core::{convert::TryInto, ops::RangeFrom};
@@ -50,10 +50,10 @@ macro_rules! test_aead {
             $(
                 #[allow(non_snake_case)]
                 mod $alg { // Provide a separate namespace for each algorithm's test.
-                    #[cfg(not(target_arch = "wasm32"))]
+                    #[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
                     use super::super::*;
 
-                    #[cfg(target_arch = "wasm32")]
+                    #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
                     use super::super::{*, test};
 
                     test_known_answer!(
