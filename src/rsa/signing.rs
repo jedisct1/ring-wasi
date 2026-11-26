@@ -166,7 +166,7 @@ impl RsaKeyPair {
             der::nested(
                 input,
                 der::Tag::Sequence,
-                error::KeyRejected::invalid_encoding(),
+                KeyRejected::invalid_encoding(),
                 Self::from_der_reader,
             )
         })
@@ -313,7 +313,7 @@ impl RsaKeyPair {
         // length of half_n_bits + 1, this check gives us 2**half_n_bits <= d,
         // and knowing d is odd makes the inequality strict.
         let (d, d_bits) = bigint::Nonnegative::from_be_bytes_with_bit_length(d)
-            .map_err(|_| error::KeyRejected::invalid_encoding())?;
+            .map_err(|_| KeyRejected::invalid_encoding())?;
         if !(half_n_bits < d_bits) {
             return Err(KeyRejected::inconsistent_components());
         }
@@ -442,7 +442,7 @@ impl<M: Prime + Clone> PrivatePrime<M> {
     fn new(p: bigint::Nonnegative, dP: untrusted::Input) -> Result<Self, KeyRejected> {
         let (p, p_bits) = bigint::Modulus::from_nonnegative_with_bit_length(p)?;
         if p_bits.as_usize_bits() % 512 != 0 {
-            return Err(error::KeyRejected::private_modulus_len_not_multiple_of_512_bits());
+            return Err(KeyRejected::private_modulus_len_not_multiple_of_512_bits());
         }
 
         // [NIST SP-800-56B rev. 1] 6.4.1.4.3 - Steps 7.a & 7.b.

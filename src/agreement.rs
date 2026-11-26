@@ -141,6 +141,7 @@ impl EphemeralPrivateKey {
         self.algorithm
     }
 
+    /// Returns the private key bytes for test vectors.
     #[cfg(test)]
     pub fn bytes(&self) -> &[u8] {
         self.private_key.bytes_less_safe()
